@@ -1,13 +1,16 @@
 "use client";
 
+import { useState } from "react";
 import { useCart } from "@/components/cart-context";
 import { TOPPINGS, type Topping } from "@/lib/toppings";
 
 export function MenuClient() {
   const { addItem } = useCart();
+  const [addedIds, setAddedIds] = useState(() => new Set<string>());
 
   function addTopping(t: Topping) {
     addItem(t.id, t.label, 0, []);
+    setAddedIds((prev) => new Set(prev).add(t.id));
   }
 
   return (
@@ -24,9 +27,13 @@ export function MenuClient() {
             <button
               type="button"
               onClick={() => addTopping(t)}
-              className="shrink-0 rounded-full bg-[var(--ember)] px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-[var(--ember-hover)] sm:min-w-[8.5rem]"
+              className={`shrink-0 rounded-full px-5 py-2.5 text-sm font-semibold shadow-sm transition sm:min-w-[8.5rem] ${
+                addedIds.has(t.id)
+                  ? "border border-stone-300 bg-stone-100 text-stone-700 hover:bg-stone-200"
+                  : "bg-[var(--ember)] text-white hover:bg-[var(--ember-hover)]"
+              }`}
             >
-              Add
+              {addedIds.has(t.id) ? "Added" : "Add"}
             </button>
           </li>
         ))}
