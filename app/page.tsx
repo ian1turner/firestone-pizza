@@ -35,7 +35,7 @@ export default function Home() {
         <h1 className="font-display max-w-3xl text-4xl font-semibold leading-[1.1] tracking-tight drop-shadow-[0_1px_2px_rgba(255,253,249,0.8)] sm:text-5xl lg:text-[3.25rem]">
           <span className="text-[var(--ember)]">Firestone Pizza</span>
           <span className="mt-2 block text-[var(--ink)] sm:mt-3">
-            Pizza from the oven,{" "}
+            Pizza from t&apos;oven,{" "}
             <span className="text-[var(--ember)]">orders on the web.</span>
           </span>
         </h1>

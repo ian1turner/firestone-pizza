@@ -17,15 +17,20 @@ export function SiteHeader() {
 
   return (
     <header className="sticky top-0 z-50 border-b border-white/10 bg-[var(--charcoal)] shadow-[var(--shadow-float)]">
-      <div className="mx-auto flex h-[4.25rem] max-w-5xl items-center justify-between gap-4 px-4 sm:px-6">
+      <div className="mx-auto flex min-h-[4.25rem] max-w-5xl items-center justify-between gap-4 px-4 py-2 sm:px-6 sm:py-0">
         <Link
           href="/"
-          className="font-display group text-left text-lg leading-tight tracking-tight transition-opacity hover:opacity-90 sm:text-xl md:text-2xl"
+          className="font-display group flex min-w-0 flex-wrap items-baseline gap-x-2 text-left text-lg leading-tight tracking-tight transition-opacity hover:opacity-90 sm:text-xl md:text-2xl"
         >
-          <span className="text-[var(--gold)] transition-colors group-hover:text-[#dcc598]">
-            Firestone
+          <span className="shrink-0">
+            <span className="text-[var(--gold)] transition-colors group-hover:text-[#dcc598]">
+              Firestone
+            </span>
+            <span className="text-[var(--cream)]"> Pizza</span>
           </span>
-          <span className="text-[var(--cream)]"> Pizza</span>
+          <span className="font-sans text-[0.7rem] font-normal leading-snug text-stone-500 sm:text-xs md:text-sm">
+            A division of Turner Enterprises
+          </span>
         </Link>
         <nav
           className="flex max-w-[min(100%,42rem)] flex-wrap items-center justify-end gap-1 sm:gap-2"
