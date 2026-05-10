@@ -7,30 +7,7 @@ import {
   readCompletedOrder,
   type CompletedOrder,
 } from "@/lib/order-storage";
-import { makeLineId } from "@/lib/cart-line-id";
-import type { CartLine } from "@/lib/cart-types";
-import { formatToppingsSummary } from "@/lib/toppings";
-
-function normalizeOrderLine(
-  line: Pick<CartLine, "menuId" | "name" | "priceCents" | "quantity"> & {
-    lineId?: string;
-    toppingIds?: string[];
-  },
-): CartLine {
-  const toppingIds = Array.isArray(line.toppingIds) ? line.toppingIds : [];
-  const lineId =
-    typeof line.lineId === "string" && line.lineId.length > 0
-      ? line.lineId
-      : makeLineId(line.menuId, toppingIds);
-  return {
-    lineId,
-    menuId: line.menuId,
-    name: line.name,
-    priceCents: line.priceCents,
-    quantity: line.quantity,
-    toppingIds,
-  };
-}
+import { formatPlacementNote, formatToppingsSummary } from "@/lib/toppings";
 
 export default function ThankYouPage() {
   const [order, setOrder] = useState<CompletedOrder | null | undefined>(
@@ -101,21 +78,19 @@ export default function ThankYouPage() {
           </div>
         </dl>
         <ul className="mt-4 space-y-2 border-t border-stone-100 pt-4 text-sm text-[var(--muted)]">
-          {order.lines.map((raw) => {
-            const line = normalizeOrderLine(raw);
-            return (
-              <li key={line.lineId}>
-                <span className="font-medium text-[var(--ink)]">
-                  {line.quantity}× {line.name}
+          {order.lines.map((line) => (
+            <li key={line.lineId}>
+              <span className="font-medium text-[var(--ink)]">{line.name}</span>
+              <span className="mt-0.5 block text-xs font-semibold leading-snug text-[var(--ember)]">
+                {formatPlacementNote(line.placement)}
+              </span>
+              {line.toppingIds.length > 0 ? (
+                <span className="mt-0.5 block text-xs leading-snug">
+                  {formatToppingsSummary(line.toppingIds)}
                 </span>
-                {line.toppingIds.length > 0 ? (
-                  <span className="mt-0.5 block text-xs leading-snug">
-                    {formatToppingsSummary(line.toppingIds)}
-                  </span>
-                ) : null}
-              </li>
-            );
-          })}
+              ) : null}
+            </li>
+          ))}
         </ul>
       </div>
 

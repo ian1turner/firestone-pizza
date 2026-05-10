@@ -2,10 +2,10 @@
 
 import Link from "next/link";
 import { useCart } from "@/components/cart-context";
-import { formatToppingsSummary } from "@/lib/toppings";
+import { formatPlacementNote, formatToppingsSummary } from "@/lib/toppings";
 
 export default function CartPage() {
-  const { lines, setQuantity, removeLine, itemCount } = useCart();
+  const { lines, removeLine, itemCount } = useCart();
 
   if (lines.length === 0) {
     return (
@@ -44,6 +44,9 @@ export default function CartPage() {
           >
             <div>
               <p className="text-lg font-semibold text-[var(--ink)]">{line.name}</p>
+              <p className="mt-1 text-sm font-semibold tracking-wide text-[var(--ember)]">
+                {formatPlacementNote(line.placement)}
+              </p>
               {line.toppingIds.length > 0 ? (
                 <p className="mt-1 text-sm text-[var(--muted)]">
                   {formatToppingsSummary(line.toppingIds)}
@@ -51,24 +54,6 @@ export default function CartPage() {
               ) : null}
             </div>
             <div className="flex items-center gap-3 sm:gap-4">
-              <label className="sr-only" htmlFor={`qty-${line.lineId}`}>
-                Quantity for {line.name}
-              </label>
-              <input
-                id={`qty-${line.lineId}`}
-                type="number"
-                min={1}
-                max={99}
-                value={line.quantity}
-                onChange={(e) => {
-                  const v = Number(e.target.value);
-                  if (Number.isNaN(v)) {
-                    return;
-                  }
-                  setQuantity(line.lineId, v);
-                }}
-                className="w-16 rounded-xl border border-stone-200 bg-white px-2 py-2.5 text-center text-sm font-semibold text-[var(--ink)] focus:border-[var(--ember)] focus:outline-none focus:ring-2 focus:ring-[var(--ember)]/25"
-              />
               <button
                 type="button"
                 onClick={() => removeLine(line.lineId)}

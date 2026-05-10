@@ -8,8 +8,9 @@ import {
   useMemo,
   useState,
 } from "react";
-import type { CartLine } from "@/lib/cart-types";
+import type { CartLine, ToppingPlacement } from "@/lib/cart-types";
 import { makeLineId } from "@/lib/cart-line-id";
+import { cartLineFromUnknown } from "@/lib/cart-line-from-unknown";
 
 type CartContextValue = {
   lines: CartLine[];
@@ -20,6 +21,7 @@ type CartContextValue = {
     name: string,
     priceCents: number,
     toppingIds: string[],
+    placement?: ToppingPlacement,
   ) => void;
   setQuantity: (lineId: string, quantity: number) => void;
   removeLine: (lineId: string) => void;
@@ -28,41 +30,7 @@ type CartContextValue = {
 
 const CartContext = createContext<CartContextValue | null>(null);
 
-const STORAGE_KEY = "firestone-pizza:cart-v4";
-
-function normalizeLine(row: unknown): CartLine | null {
-  if (typeof row !== "object" || row === null) {
-    return null;
-  }
-  const r = row as Record<string, unknown>;
-  if (
-    typeof r.menuId !== "string" ||
-    typeof r.name !== "string" ||
-    typeof r.priceCents !== "number" ||
-    typeof r.quantity !== "number"
-  ) {
-    return null;
-  }
-  let toppingIds: string[] = [];
-  if (
-    Array.isArray(r.toppingIds) &&
-    r.toppingIds.every((x): x is string => typeof x === "string")
-  ) {
-    toppingIds = r.toppingIds;
-  }
-  const lineId =
-    typeof r.lineId === "string"
-      ? r.lineId
-      : makeLineId(r.menuId, toppingIds);
-  return {
-    lineId,
-    menuId: r.menuId,
-    name: r.name,
-    priceCents: r.priceCents,
-    quantity: r.quantity,
-    toppingIds,
-  };
-}
+const STORAGE_KEY = "firestone-pizza:cart-v5";
 
 function loadFromStorage(): CartLine[] {
   if (typeof window === "undefined") {
@@ -78,7 +46,7 @@ function loadFromStorage(): CartLine[] {
       return [];
     }
     return parsed
-      .map(normalizeLine)
+      .map(cartLineFromUnknown)
       .filter((row): row is CartLine => row !== null);
   } catch {
     return [];
@@ -117,8 +85,9 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       name: string,
       priceCents: number,
       toppingIds: string[],
+      placement: ToppingPlacement = "full",
     ) => {
-      const lineId = makeLineId(menuId, toppingIds);
+      const lineId = makeLineId(menuId, toppingIds, placement);
       setLines((prev) => {
         const idx = prev.findIndex((l) => l.lineId === lineId);
         if (idx === -1) {
@@ -131,6 +100,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
               priceCents,
               quantity: 1,
               toppingIds: [...toppingIds],
+              placement,
             },
           ];
         }
@@ -165,11 +135,25 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const value = useMemo<CartContextValue>(() => {
-    const itemCount = lines.reduce((acc, l) => acc + l.quantity, 0);
-    const totalCents = lines.reduce(
-      (acc, l) => acc + l.priceCents * l.quantity,
-      0,
-    );
+    const safeLines = Array.isArray(lines) ? lines : [];
+    const itemCount = safeLines.reduce((acc, l) => {
+      const q =
+        typeof l.quantity === "number" && Number.isFinite(l.quantity)
+          ? Math.max(0, Math.floor(l.quantity))
+          : 0;
+      return acc + q;
+    }, 0);
+    const totalCents = safeLines.reduce((acc, l) => {
+      const q =
+        typeof l.quantity === "number" && Number.isFinite(l.quantity)
+          ? Math.max(0, Math.floor(l.quantity))
+          : 0;
+      const cents =
+        typeof l.priceCents === "number" && Number.isFinite(l.priceCents)
+          ? l.priceCents
+          : 0;
+      return acc + cents * q;
+    }, 0);
     return {
       lines,
       itemCount,

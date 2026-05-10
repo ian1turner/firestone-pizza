@@ -3,9 +3,12 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev --hostname 127.0.0.1",
-    "build": "next build",
-    "start": "next start",
+    "clean": "rm -rf .next",
+    "dev": "WATCHPACK_POLLING=true node ./node_modules/next/dist/bin/next dev --hostname 127.0.0.1",
+    "dev:turbo": "WATCHPACK_POLLING=true node ./node_modules/next/dist/bin/next dev --turbopack --hostname 127.0.0.1",
+    "dev:clean": "npm run clean && npm run dev",
+    "build": "node ./node_modules/next/dist/bin/next build",
+    "start": "node ./node_modules/next/dist/bin/next start",
     "lint": "eslint"
   },
   "engines": {

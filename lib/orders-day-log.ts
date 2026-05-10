@@ -1,4 +1,7 @@
-import type { CompletedOrder } from "@/lib/order-storage";
+import {
+  type CompletedOrder,
+  completedOrderFromUnknown,
+} from "@/lib/order-storage";
 
 const STORAGE_KEY = "firestone-pizza:day-orders-v1";
 const MAX_ORDERS = 10;
@@ -31,16 +34,9 @@ function loadRaw(): CompletedOrder[] {
     if (!Array.isArray(parsed)) {
       return [];
     }
-    return parsed.filter(
-      (row): row is CompletedOrder =>
-        typeof row === "object" &&
-        row !== null &&
-        typeof (row as CompletedOrder).orderId === "string" &&
-        typeof (row as CompletedOrder).guestName === "string" &&
-        Array.isArray((row as CompletedOrder).lines) &&
-        typeof (row as CompletedOrder).totalCents === "number" &&
-        typeof (row as CompletedOrder).placedAt === "string",
-    );
+    return parsed
+      .map((row) => completedOrderFromUnknown(row))
+      .filter((o): o is CompletedOrder => o !== null);
   } catch {
     return [];
   }

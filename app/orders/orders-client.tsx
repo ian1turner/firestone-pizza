@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { getTodaysOrders, removeTodaysOrder } from "@/lib/orders-day-log";
 import type { CompletedOrder } from "@/lib/order-storage";
-import { formatToppingsSummary } from "@/lib/toppings";
+import { formatPlacementNote, formatToppingsSummary } from "@/lib/toppings";
 
 export function OrdersClient() {
   const [orders, setOrders] = useState<CompletedOrder[] | null>(null);
@@ -96,7 +96,10 @@ export function OrdersClient() {
                   {order.lines.map((line) => (
                     <li key={line.lineId}>
                       <span className="font-medium text-[var(--ink)]">
-                        {line.quantity}× {line.name}
+                        {line.name}
+                      </span>
+                      <span className="mt-0.5 block text-xs font-semibold leading-snug text-[var(--ember)]">
+                        {formatPlacementNote(line.placement)}
                       </span>
                       {line.toppingIds.length > 0 ? (
                         <span className="mt-0.5 block text-xs leading-snug">

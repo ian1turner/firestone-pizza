@@ -8,6 +8,7 @@ import { appendTodaysOrder } from "@/lib/orders-day-log";
 import type { CompletedOrder } from "@/lib/order-storage";
 import { saveCompletedOrder } from "@/lib/order-storage";
 import {
+  formatPlacementNote,
   formatToppingsSummary,
   ITALIAN_TOMATO_BASE_ID,
   toppingLabel,
@@ -124,6 +125,7 @@ export default function CheckoutPage() {
       toppingLabel(ITALIAN_TOMATO_BASE_ID),
       0,
       [],
+      "full",
     );
     setBaseModalOpen(false);
   }
@@ -177,8 +179,9 @@ export default function CheckoutPage() {
                 key={line.lineId}
                 className="py-3 text-sm text-[var(--muted)]"
               >
-                <span className="font-medium text-[var(--ink)]">
-                  {line.quantity}× {line.name}
+                <span className="font-medium text-[var(--ink)]">{line.name}</span>
+                <span className="mt-0.5 block text-xs font-semibold leading-snug text-[var(--ember)]">
+                  {formatPlacementNote(line.placement)}
                 </span>
                 {line.toppingIds.length > 0 ? (
                   <span className="mt-0.5 block text-xs leading-snug">
@@ -248,7 +251,7 @@ export default function CheckoutPage() {
                 onClick={handleYesAddBase}
                 className="flex-1 rounded-full bg-[var(--ember)] px-5 py-3 text-sm font-semibold text-white shadow-md shadow-[var(--ember)]/25 transition hover:bg-[var(--ember-hover)]"
               >
-                Doh, yes i do!
+                Dough! 😉, yes i do!
               </button>
             </div>
           </div>

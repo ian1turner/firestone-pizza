@@ -9,12 +9,17 @@ const fraunces = Fraunces({
   subsets: ["latin"],
   variable: "--font-fraunces",
   display: "swap",
+  /** Avoids font-metrics fallback generation that can fail in some CI / proxy setups. */
+  adjustFontFallback: false,
+  fallback: ["Georgia", "Times New Roman", "serif"],
 });
 
 const literata = Literata({
   subsets: ["latin"],
   variable: "--font-literata",
   display: "swap",
+  adjustFontFallback: false,
+  fallback: ["Georgia", "Times New Roman", "serif"],
 });
 
 export const metadata: Metadata = {
@@ -32,8 +37,9 @@ export default function RootLayout({
     <html
       lang="en"
       className={`${fraunces.variable} ${literata.variable} h-full`}
+      suppressHydrationWarning
     >
-      <body className="flex min-h-full flex-col antialiased">
+      <body className="flex min-h-full flex-col antialiased" suppressHydrationWarning>
         <CartProvider>
           <SiteHeader />
           <main className="flex-1">{children}</main>

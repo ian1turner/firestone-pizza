@@ -1,14 +1,10 @@
 import type { NextConfig } from "next";
-import path from "node:path";
-import { fileURLToPath } from "node:url";
 
-/** Directory that contains this config file (the real Next app root). */
-const projectRoot = path.dirname(fileURLToPath(import.meta.url));
-
+/** Keep config minimal: explicit `turbopack.root` can mis-resolve in some setups and break dev. */
 const nextConfig: NextConfig = {
-  turbopack: {
-    // Avoid mis-inferred root (e.g. `.../Pizza app/app`) so `next` resolves correctly.
-    root: projectRoot,
+  images: {
+    /** Avoid `/_next/image` 500s when the optimizer (e.g. sharp) is unavailable on the host. */
+    unoptimized: true,
   },
 };
 
